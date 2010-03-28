@@ -26,6 +26,7 @@ def main():
     parser.add_option('-n', '--no-colors', default=None, action='store_true', dest='no_colors')
     parser.add_option('-c', '--colored', default=None, action='store_true', dest='colored')
     parser.add_option('-l', '--language', default='en-us', dest='language')
+    parser.add_option('-v', '--verbose', action="store_true", dest='verbose')
     values, args = parser.parse_args()
 
     try:
@@ -34,11 +35,19 @@ def main():
                             if filename.endswith('.story')])
             stories_dirname = values.stories_dir
         elif files == []:
+            if values.verbose:
+                for filename in os.listdir(stories_dirname):
+                    print "Looking at %s: ends in .story?(%s)" % (filename, filename.endswith(".story"))
+                if len(os.listdir(stories_dirname)) == 0:
+                    print "could not find any files in %s" % (stories_dirname)
+
             files.extend([stories_dirname+'/'+filename for filename in os.listdir(stories_dirname)
                                               if filename.endswith('.story')])
 
         steps_modules = find_steps_modules(values.steps_dir or stories_dirname+'/step_definitions')
-    except OSError:
+    except OSError, e:
+        if values.verbose:
+            print "Had OS Error (%s), could not find files" % (e)
         pass
 
     colored = True
@@ -46,6 +55,8 @@ def main():
         colored = False
 
     exit_code = True
+    if values.verbose:
+        print "Reading %d story files" % (len(files))
     for index, story in enumerate(files):
         story_status = StoryRunner(open(story).read(),
                                          sys.stdout,
