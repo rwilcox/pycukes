@@ -5,12 +5,15 @@ import re
 
 
 class StoryRunner(object):
-    def __init__(self, story_text, output, colored, modules=(), language='en-us'):
+    def __init__(self, story_text, output, colored, modules=(), language='en-us', verbose=False):
         self._story_text = story_text
         self._output = output
         self._modules = modules
         self._colored = colored
         self._language = language
+        self._verbose = verbose
+        if self._verbose:
+            print "current story text is: %s" % story_text
         self._parsed_story = parse_text(story_text, self._language)
         self._pycukes_story = self._get_pycukes_story()
         self._all_givens = {}
@@ -28,6 +31,8 @@ class StoryRunner(object):
 
     def _get_header(self):
         story = self._parsed_story.get_stories()[0]
+        if self._verbose:
+            print "Header of this story is: %s" % story.header
         return story.header
 
     def _get_pycukes_story(self):
@@ -43,6 +48,8 @@ class StoryRunner(object):
 
     def run(self):
         scenarios = self._parsed_story.get_stories()[0].scenarios
+        if self._verbose:
+            print "examining %d scenarios" % len(scenarios)
         for scenario_title, steps in scenarios:
             new_scenario = type('PyCukesScenario',
                                 (Scenario,),

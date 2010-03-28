@@ -62,7 +62,8 @@ def main():
                                          sys.stdout,
                                          colored=colored,
                                          modules=steps_modules,
-                                         language=values.language).run()
+                                         language=values.language,
+                                         verbose=values.verbose).run()
         exit_code = exit_code and story_status
         if index < len(files)-1:
             sys.stdout.write('\n\n')
